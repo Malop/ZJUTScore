@@ -30,11 +30,12 @@ public class getScoreServlet extends HttpServlet{
 		response.setContentType("text/html;charset=utf-8");
 		response.setCharacterEncoding("utf-8");
 		PrintWriter out = response.getWriter();
-		out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		
 		
 		String userId = request.getParameter("userId");
 		String password = request.getParameter("password");
 		String term = request.getParameter("term");
+		String method = request.getParameter("method");
 		
 		myHttpUtil = new HttpUtil(userId,password, term);
 		try {
@@ -50,8 +51,8 @@ public class getScoreServlet extends HttpServlet{
 				scoreList = queryHtmlPaser.getScore();
 				if(scoreList.size() == 0){
 					out.print("<script language='javascript'>alert('该学期没有你的成绩！请重新输入！');window.location.href='index.jsp';</script>");
-				}else{
-					
+				}else if(method.equals("xml")){
+					out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 					out.println("<courses>");
 					for(int i=0;i<scoreList.size();i++){
 						out.println("<course>");
@@ -69,6 +70,18 @@ public class getScoreServlet extends HttpServlet{
 						out.println("</course>");
 					}
 					out.println("</courses>");
+				}else if(method.equals("json")){
+					out.print("{\"courses\":[");
+					for(int j=0;j<scoreList.size();j++){
+						out.print("{\"courseName\":\""+scoreList.get(j).getCourse()+"\",");
+						out.print("\"courseCredit\":\""+scoreList.get(j).getCredit()+"\",");
+						out.print("\"courseScore\":\""+scoreList.get(j).getScore()+"\"}");
+						if(j != scoreList.size()-1){
+							out.print(",");
+						}else{
+							out.print("]}");
+						}
+					}
 				}
 			}
 			
